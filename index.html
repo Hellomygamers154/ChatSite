@@ -1,69 +1,48 @@
-// Import the Random User Generator JavaScript library.
-import RandomUserGenerator from 'random-user-generator-js';
-
-// Create a Random User Generator client object.
-const client = new RandomUserGenerator();
-
-// Get a random user object.
-const user = await client.getRandomUser();
-
-// Get the user's avatar URL.
-const avatarUrl = user.avatarUrl;
-
-// Create a video element.
-const video = document.createElement('video');
-
-// Set the video element's srcObject to the user's avatar URL.
-video.srcObject = new Promise((resolve, reject) => {
-  const xhr = new XMLHttpRequest();
-  xhr.open('GET', avatarUrl);
-  xhr.responseType = 'arraybuffer';
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      resolve(new MediaStream([new MediaStreamTrack('video', xhr.response)));
-    } else {
-      reject(new Error('Failed to load avatar: ' + xhr.statusText));
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Omegle Rip-Off</title>
+  <style>
+    video {
+      width: 300px;
+      height: 200px;
     }
-  };
-  xhr.send();
 
-  // Import the Random User Generator JavaScript library.
-import RandomUserGenerator from 'random-user-generator-js';
-
-// Create a Random User Generator client object.
-const client = new RandomUserGenerator();
-
-// Get a random user object.
-const user = await client.getRandomUser();
-
-// Get the user's avatar URL.
-const avatarUrl = user.avatarUrl;
-
-// Create a video element.
-const video = document.createElement('video');
-
-// Set the video element's srcObject to the user's avatar URL.
-video.srcObject = new Promise((resolve, reject) => {
-  const xhr = new XMLHttpRequest();
-  xhr.open('GET', avatarUrl);
-  xhr.responseType = 'arraybuffer';
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      resolve(new MediaStream([new MediaStreamTrack('video', xhr.response)));
-    } else {
-      reject(new Error('Failed to load avatar: ' + xhr.statusText));
+    button {
+      margin-top: 10px;
     }
-  };
-  xhr.send();
-});
+  </style>
+</head>
+<body>
+  <video id="video"></video>
 
-// Add the video element to the DOM.
-document.body.appendChild(video);
+  <button id="connect-button">Connect to a random user</button>
 
-// Start playing the video element.
-video.play();
+  <script>
+    // Get the video element.
+    const video = document.querySelector('#video');
 
-});
+    // Get the connect button.
+    const connectButton = document.querySelector('#connect-button');
 
-// Start playing the video element.
-video.play();
+    // Create a new WebSocket connection to the Omegle server.
+    const socket = new WebSocket('wss://omegle-rip-off.herokuapp.com');
+
+    // When the connection is open, send a message to the server to request a random user.
+    socket.addEventListener('open', () => {
+      socket.send('random');
+    });
+
+    // When the server sends a message, update the video element's srcObject to the user's avatar URL.
+    socket.addEventListener('message', (event) => {
+      const data = JSON.parse(event.data);
+      video.srcObject = data.avatarUrl;
+    });
+
+    // When the user clicks the connect button, connect to a random user.
+    connectButton.addEventListener('click', () => {
+      socket.send('connect');
+    });
+  </script>
+</body>
+</html>
