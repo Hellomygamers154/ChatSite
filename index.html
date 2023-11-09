@@ -15,6 +15,20 @@
 </head>
 <body>
   <video id="video"></video>
+  <video id="user-video"></video>
+
+  video {
+  width: 300px;
+  height: 200px;
+}
+
+#user-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+
 
   <button id="connect-button">Connect to a random user</button>
 
@@ -32,6 +46,19 @@
     socket.addEventListener('open', () => {
       socket.send('random');
     });
+
+    // Get the user video element.
+  const userVideo = document.querySelector('#user-video');
+
+    // Request access to the user's camera.
+    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+    // Set the user video element's srcObject to the media stream.
+    userVideo.srcObject = stream;
+
+    // Start playing the video.
+    userVideo.play();
+    });
+
 
     // When the server sends a message, update the video element's srcObject to the user's avatar URL.
     socket.addEventListener('message', (event) => {
